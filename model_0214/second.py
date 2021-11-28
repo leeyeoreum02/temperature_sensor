@@ -69,7 +69,8 @@ def main():
 
     width = 1280
     height = 720
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0) # desktop
+    cap = cv2.VideoCapture(1) # notebook
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
