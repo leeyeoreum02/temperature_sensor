@@ -1,0 +1,5 @@
+weights/*.pth
+!weights/model_mobileV3_27_0.220.pth
+
+/YOLOX
+/data
