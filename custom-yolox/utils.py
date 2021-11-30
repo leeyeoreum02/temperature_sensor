@@ -25,14 +25,14 @@ def all_gt_pascal2coco(
     }
     
     n_id = 0
-    for annot_path in tqdm(xml_paths):
+    for img_id, annot_path in tqdm(enumerate(xml_paths)):
         tree = ET.parse(annot_path)
         root = tree.getroot()
         
         height = int(root.find('size').findtext('height'))
         width = int(root.find('size').findtext('width'))
         file_name = root.findtext('filename')
-        img_id = int(file_name.split('.')[0][-1])
+        # img_id = int(file_name[12:].split('.')[0])
         
         ret['images'].append({
             'file_name': file_name,
@@ -59,6 +59,10 @@ def all_gt_pascal2coco(
             })
             n_id += 1
     
+    ret['categories'].append({
+        'id': 0,
+        'name': '__background__',
+    })
     for name, id in categories.items():
         ret['categories'].append({
             'id': id,
@@ -180,8 +184,9 @@ def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
         
 if __name__ == '__main__':
     root_path = '../data/'
+    all_gt_pascal2coco(root_path, root_path + 'annotations.json')
     train_path = '../data/train/'
     valid_path = '../data/valid/'
-    # split_train_valid(root_path, train_path, valid_path)
+    split_train_valid(root_path, train_path, valid_path)
     all_gt_pascal2coco(root_path + 'train', root_path + 'train/annotations.json')
     all_gt_pascal2coco(root_path + 'valid', root_path + 'valid/annotations.json')

@@ -1062,6 +1062,8 @@ class YoloXTrainModel(pl.LightingModule):
         self.width = cfg.width
         self.act = cfg.act
         
+        self.input_size = cfg.input_size
+        
         self.warmup_epochs = cfg.warmup_epochs
         self.max_iter = len(self.data_module.train_loader)
         self.max_epoch = args.max_epoch
@@ -1134,4 +1136,29 @@ class YoloXTrainModel(pl.LightingModule):
         return optimizer
     
     def training_step(self, batch, batch_idx):
-        print(batch_idx, self.current_epoch)
+        if self.current_epoch == 0:
+            logger.info("---> start train epoch{}".format(self.epoch + 1))
+
+        if self.current_epoch + 1 == self.max_epoch - self.no_aug_epochs or self.data_module.no_aug:
+            logger.info("--->No mosaic aug now!")
+            self.train_loader.close_mosaic()
+            logger.info("--->Add additional L1 loss now!")
+            self.eval_interval = 1
+            
+        inps, targets, _, _ = batch
+        inps, targets = self.preprocess(inps, targets, self.input_size)
+        outputs = self.model(inps, targets)
+        loss = outputs['total_loss']
+        
+        return loss
+        
+    def preprocess(self, inputs, targets, tsize):
+        scale_y = tsize[0] / self.data_module.input_size[0]
+        scale_x = tsize[1] / self.data_module.input_size[1]
+        if scale_x != 1 or scale_y != 1:
+            inputs = nn.functional.interpolate(
+                inputs, size=tsize, mode="bilinear", align_corners=False
+            )
+            targets[..., 1::2] = targets[..., 1::2] * scale_x
+            targets[..., 2::2] = targets[..., 2::2] * scale_y
+        return inputs, targets
