@@ -48,32 +48,39 @@ def draw_bbox(raw_img, bbox, color, label):
     cv2.circle(raw_img, (x+w//2, y+h//2), 2, color, 2)
     
     
-def get_temperature(arduino_serial, raw_img, bbox, label):
-    x, y, w, h = bbox
+def draw_temperature(message, raw_img, frame_height, frame_width):
+    (tw, th), _ = cv2.getTextSize(message, 
+        cv2.FONT_HERSHEY_COMPLEX, 3, 2)
+    cv2.rectangle(
+        raw_img, 
+        (0, frame_height-100), 
+        (frame_width, frame_height-100+th), 
+        (0, 255, 0), -1)
+    output = raw_img.copy()
+    cv2.addWeighted(raw_img, 0.5, output, 0.5, 0, output)
+    cv2.putText(raw_img, message, 
+        (0, frame_height-100-5), cv2.FONT_HERSHEY_SIMPLEX, 
+        3, (255, 255, 255), 2, cv2.LINE_AA)
     
-    if label == 2:
-        draw_bbox(raw_img, bbox, 'black', label)
-        return
+    
+def get_temperature(arduino_serial, frame_width, frame_height, raw_img, bbox):
+    _, _, w, h = bbox
         
-    if w <= 300 or h <= 400:
-        draw_bbox(raw_img, bbox, 'blue', label)
-        return
-    
-    temperature = arduino_serial.readlines()
-    
-    if not is_available(temperature)[0]:
-        draw_bbox(raw_img, bbox, 'blue', label)
-        return
+    if w > 300 and h > 400:
+        temperature = arduino_serial.readlines()
         
-    temperature = is_available(temperature)[1]
-    cv2.putText(raw_img, f'{temperature}C', (900, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 0, 2, cv2.LINE_AA)
-    
-    if temperature >= 37.5:
-        draw_bbox(raw_img, bbox, 'red', label)
-    elif temperature > 30.0 and temperature < 37.5:
-        draw_bbox(raw_img, bbox, 'green', label)
-    else:
-        draw_bbox(raw_img, bbox, 'sky', label)
+        if not is_available(temperature)[0]:
+            draw_temperature('측정 중...', 
+                raw_img, frame_height, frame_width)
+            
+        temperature = is_available(temperature)[1]
+            
+        if temperature < 30.0:
+            draw_temperature('좀만 더 가까이 오세요.', 
+                raw_img, frame_height, frame_width)
+        else:
+            draw_temperature(str(temperature), 
+                raw_img, frame_height, frame_width)
     
 
 def main():
@@ -135,8 +142,12 @@ def main():
             # cv2.putText(raw_img, f'width: {w}, height: {h}', (900, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 0, 2, cv2.LINE_AA)
                 
             # cv2.putText(raw_img, f'{temperature}˚C', (900, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.8, 0, 2, cv2.LINE_AA)
-            
-            get_temperature(ArduinoSerial, raw_img, (x, y, w, h), label)
+            if label == 1:
+                draw_bbox(raw_img, (x, y, w, h), 'green', label)
+            else:
+                draw_bbox(raw_img, (x, y, w, h), 'red', label)
+                
+            get_temperature(ArduinoSerial, width, height, raw_img, (x, y, w, h))
                             
         cv2.rectangle(raw_img, (width//2-100, height//2-100),
                     (width//2+100, height//2+100),
