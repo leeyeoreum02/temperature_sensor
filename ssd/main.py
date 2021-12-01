@@ -72,6 +72,7 @@ def get_temperature(arduino_serial, frame_width, frame_height, raw_img, bbox):
         if not is_available(temperature)[0]:
             draw_temperature('측정 중...', 
                 raw_img, frame_height, frame_width)
+            return
             
         temperature = is_available(temperature)[1]
             
