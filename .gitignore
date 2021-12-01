@@ -1,7 +1,7 @@
 __pycache__
 
-model_0214/weights/*.pth
-!model_0214/weights/model_mobileV3_27_0.220.pth
+faster_rcnn/weights/*.pth
+!faster_rcnn/weights/model_mobileV3_27_0.220.pth
 
 ssd/weights/*.ckpt
 !ssd/weights/epoch=99-val_map50=0.48.ckpt
