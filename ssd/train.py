@@ -20,11 +20,11 @@ def get_train_transforms():
     return A.Compose(
         [
             # A.Resize(height=720, width=1024),
-            A.RandomBrightnessContrast(p=0.2),
-            A.RandomContrast(p=0.2),
-            A.Blur(p=0.2),
-            A.MedianBlur(p=0.2),
-            A.ColorJitter(p=0.2),
+            # A.RandomBrightnessContrast(p=0.2),
+            # A.RandomContrast(p=0.2),
+            # A.Blur(p=0.2),
+            # A.MedianBlur(p=0.2),
+            # A.ColorJitter(p=0.2),
             A.GaussianBlur(p=0.2),
             A.HorizontalFlip(p=0.2),
             A.RandomCrop(height=150, width=150, p=0.4),
