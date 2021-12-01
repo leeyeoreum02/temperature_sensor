@@ -42,9 +42,9 @@ def draw_bbox(raw_img, bbox, color, label):
     }
     
     cv2.rectangle(raw_img, (x, y, w, h), color, 1)
-    (tw, th), _ = cv2.getTextSize(categories[label], cv2.FONT_HERSHEY_COMPLEX, 0.4, 1)
+    (tw, th), _ = cv2.getTextSize(categories[label], cv2.FONT_HERSHEY_COMPLEX, 0.8, 2)
     cv2.rectangle(raw_img, (x, y-20), (x+tw, y), color, -1)
-    cv2.putText(raw_img, categories[label], (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(raw_img, categories[label], (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
     cv2.circle(raw_img, (x+w//2, y+h//2), 2, color, 2)
     
     
@@ -57,9 +57,10 @@ def draw_temperature(message, raw_img, frame_height, frame_width):
         (frame_width, frame_height-100+th), 
         (0, 255, 0), -1)
     output = raw_img.copy()
-    cv2.addWeighted(raw_img, 0.5, output, 0.5, 0, output)
+    cv2.addWeighted(raw_img, 0.8, output, 0.5, 0, output)
     cv2.putText(raw_img, message, 
-        (0, frame_height-100-5), cv2.FONT_HERSHEY_SIMPLEX, 
+        (frame_width//2, frame_height-100+th//2), 
+        cv2.FONT_HERSHEY_SIMPLEX, 
         3, (255, 255, 255), 2, cv2.LINE_AA)
     
     
@@ -70,14 +71,14 @@ def get_temperature(arduino_serial, frame_width, frame_height, raw_img, bbox):
         temperature = arduino_serial.readlines()
         
         if not is_available(temperature)[0]:
-            draw_temperature('측정 중...', 
+            draw_temperature('Measuring...', 
                 raw_img, frame_height, frame_width)
             return
             
         temperature = is_available(temperature)[1]
             
         if temperature < 30.0:
-            draw_temperature('좀만 더 가까이 오세요.', 
+            draw_temperature('Please come close.', 
                 raw_img, frame_height, frame_width)
         else:
             draw_temperature(str(temperature), 
@@ -87,7 +88,7 @@ def get_temperature(arduino_serial, frame_width, frame_height, raw_img, bbox):
 def main():
     ckpt_path = './weights/epoch=99-val_map50=0.48.ckpt'
     
-    device = 'cpu'
+    device = 'cuda'
     model = SSDLiteModel(num_classes=3).to(device)
     ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(ckpt['state_dict'])
@@ -117,7 +118,7 @@ def main():
         prev_frame_time = new_frame_time
         
         img = cv2.cvtColor(raw_img, cv2.COLOR_BGR2RGB)
-        bboxs, labels = predict(model, device, img, nm_thrs=0.3, score_thrs=0.9)
+        bboxs, labels = predict(model, device, img, nm_thrs=0.2, score_thrs=0.9)
         
         if bboxs.size != 0:
             widths = bboxs[:, 2] - bboxs[:, 0]
