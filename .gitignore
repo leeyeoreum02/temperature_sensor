@@ -1,0 +1,10 @@
+__pycache__
+
+model_0214/weights/*.pth
+!model_0214/weights/model_mobileV3_27_0.220.pth
+
+ssd/weights/*.ckpt
+ssd/lightning_logs
+
+/YOLOX
+/data
