@@ -42,9 +42,9 @@ def draw_bbox(raw_img, bbox, color, label):
     }
     
     cv2.rectangle(raw_img, (x, y, w, h), color, 1)
-    (tw, th), _ = cv2.getTextSize(categories[label], cv2.FONT_HERSHEY_COMPLEX, 0.4, 1)
+    (tw, th), _ = cv2.getTextSize(categories[label], cv2.FONT_HERSHEY_COMPLEX, 0.8, 2)
     cv2.rectangle(raw_img, (x, y-20), (x+tw, y), color, -1)
-    cv2.putText(raw_img, categories[label], (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(raw_img, categories[label], (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
     cv2.circle(raw_img, (x+w//2, y+h//2), 2, color, 2)
     
     
