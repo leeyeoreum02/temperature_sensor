@@ -102,7 +102,6 @@ class SSDLiteModel(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         images, targets = batch
-        # print('val:', images, targets)
         # fasterrcnn takes only images for eval() mode
         outs = self.model(images)
         # iou = torch.stack([_evaluate_iou(t, o) for t, o in zip(targets, outs)]).mean()
@@ -113,16 +112,11 @@ class SSDLiteModel(LightningModule):
             prog_bar=True, logger=True
         )
         
-        # self.log('val_iou', iou)
-        
-        # return {"val_iou": iou}
-
     def validation_epoch_end(self, outs):
         # avg_iou = torch.stack([o["val_iou"] for o in outs]).mean()
         avg_map = self.metric.compute()
         
         logs = {"val_map50": avg_map['map_50'].detach()}
-        # self.log('val_map50', avg_map['map_50'].detach())
         
         self.metric.reset()
         

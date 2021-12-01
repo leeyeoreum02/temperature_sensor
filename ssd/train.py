@@ -85,7 +85,6 @@ def main():
         gpus=1,
         precision=16,
         log_every_n_steps=1,
-        # default_root_dir='./weights/',
         callbacks=[checkpoint_callback],
     )
 

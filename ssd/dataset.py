@@ -28,7 +28,6 @@ class FaceTrainDataset(Dataset):
             'height': annot['height'],
             'width': annot['width']
         } for annot in annotations['images']}
-        # print(self.image_ids)
 
         self.annotations = defaultdict(list)
         for annot in annotations['annotations']:
@@ -50,7 +49,6 @@ class FaceTrainDataset(Dataset):
 
         boxes = []
         labels = []
-        # areas = []
         for annot in self.annotations[index]:
             x1, y1, w, h = annot['bbox']
             x2, y2 = x1 + w, y1 + h
@@ -133,10 +131,3 @@ class SSDLiteDataModule(LightningDataModule):
             num_workers=self.num_workers,
             collate_fn=_collate_fn,
         )
-    
-
-if __name__ == '__main__':
-    # dataset = EfficientDetDataset('./data/', './data/annotations.json', get_train_transforms())
-    # print(dataset[1])
-    data_loader = SSDLiteDataModule()
-    print(data_loader.on_train_dataloader)
